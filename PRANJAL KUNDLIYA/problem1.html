@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .calculator-container {
+            max-width: 400px;
+            width: 90%;
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .input-field, .select-field {
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .input-field:focus, .select-field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+        .calculate-button {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.85rem 1.5rem;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+        }
+        .calculate-button:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+        .result-display {
+            background-color: #e0f2fe;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e40af;
+            text-align: center;
+            min-height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-all;
+        }
+        .error-message {
+            color: #dc2626;
+            font-weight: 500;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <h1 class="text-3xl font-extrabold text-gray-800 text-center mb-4">Simple Calculator</h1>
+
+        <div class="input-group">
+            <label for="numA" class="text-gray-700 font-medium">First Number (a):</label>
+            <input type="number" id="numA" class="input-field" placeholder="Enter first number">
+        </div>
+
+        <div class="input-group">
+            <label for="numB" class="text-gray-700 font-medium">Second Number (b):</label>
+            <input type="number" id="numB" class="input-field" placeholder="Enter second number">
+        </div>
+
+        <div class="input-group">
+            <label for="operation" class="text-gray-700 font-medium">Operation:</label>
+            <select id="operation" class="select-field">
+                <option value="add">Addition (+)</option>
+                <option value="subtract">Subtraction (-)</option>
+                <option value="multiply">Multiplication (*)</option>
+                <option value="divide">Division (/)</option>
+            </select>
+        </div>
+
+        <button id="calculateBtn" class="calculate-button">Calculate</button>
+
+        <div id="result" class="result-display">
+            Result will appear here
+        </div>
+    </div>
+
+    <script>
+        class Calculator {
+            add(a, b) {
+                return a + b;
+            }
+            subtract(a, b) {
+                return a - b;
+            }
+            multiply(a, b) {
+                return a * b;
+            }
+            divide(a, b) {
+                if (b === 0) {
+                    return "Error: Division by zero!";
+                }
+                return a / b;
+            }
+            calculate(a, b, operationType) {
+                switch (operationType) {
+                    case 'add':
+                        return this.add(a, b);
+                    case 'subtract':
+                        return this.subtract(a, b);
+                    case 'multiply':
+                        return this.multiply(a, b);
+                    case 'divide':
+                        return this.divide(a, b);
+                    default:
+                        return "Error: Invalid operation type.";
+                }
+            }
+        }
+
+        const numAInput = document.getElementById('numA');
+        const numBInput = document.getElementById('numB');
+        const operationSelect = document.getElementById('operation');
+        const calculateButton = document.getElementById('calculateBtn');
+        const resultDisplay = document.getElementById('result');
+
+        calculateButton.addEventListener('click', () => {
+            const numA = parseFloat(numAInput.value);
+            const numB = parseFloat(numBInput.value);
+            const operationType = operationSelect.value;
+
+            if (isNaN(numA) || isNaN(numB)) {
+                resultDisplay.textContent = "Error: Please enter valid numbers.";
+                resultDisplay.classList.add('error-message');
+                resultDisplay.classList.remove('result-display');
+                return;
+            }
+
+            const calculator = new Calculator();
+            const result = calculator.calculate(numA, numB, operationType);
+
+            if (typeof result === 'string' && result.includes("Error")) {
+                resultDisplay.textContent = result;
+                resultDisplay.classList.add('error-message');
+                resultDisplay.classList.remove('result-display');
+            } else {
+                resultDisplay.textContent = `Result: ${Math.round(result * 100000000) / 100000000}`;
+                resultDisplay.classList.remove('error-message');
+                resultDisplay.classList.add('result-display');
+            }
+        });
+
+        numAInput.addEventListener('input', () => {
+            if (resultDisplay.classList.contains('error-message')) {
+                resultDisplay.textContent = "Result will appear here";
+                resultDisplay.classList.remove('error-message');
+                resultDisplay.classList.add('result-display');
+            }
+        });
+
+        numBInput.addEventListener('input', () => {
+            if (resultDisplay.classList.contains('error-message')) {
+                resultDisplay.textContent = "Result will appear here";
+                resultDisplay.classList.remove('error-message');
+                resultDisplay.classList.add('result-display');
+            }
+        });
+
+        operationSelect.addEventListener('change', () => {
+            if (resultDisplay.classList.contains('error-message')) {
+                resultDisplay.textContent = "Result will appear here";
+                resultDisplay.classList.remove('error-message');
+                resultDisplay.classList.add('result-display');
+            }
+        });
+    </script>
+</body>
+</html>
